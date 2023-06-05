@@ -1,28 +1,4 @@
 
-def "set auth" [data:  record] {
-  let dir = ($env.HOME | path join "payzum")
-  if not ($dir | path exists) {
-    mkdir $dir
-  }
-  $data | save -f ($dir | path join "auth.nuon")
-}
-
-def "get header" [token?: string] {
-  if ($token | is-empty) {
-    []
-  } else {
-    [Authorization, $"Bearer ($token)"]
-  }
-}
-
-def "get base" [url: string] {
-  $"http://localhost:3000/api/v1/client/auth($url)"
-}
-
-def "post" [url: string, body: record, token?: string] {
-  (http post -f -e -t "application/json" -H (get header $token) (get base $url) $body)
-}
-
 export def "signup email" [key: string@select] {
   let resp = (post "/email/signup" (get user $key | into record))
   if $resp.status != 200 {
@@ -85,6 +61,33 @@ export def "signin phone" [key: string@select] {
   }
 
   set auth $resp.body.data
+}
+
+def "set auth" [data:  record] {
+  let dir = ($env.HOME | path join "payzum")
+  if not ($dir | path exists) {
+    mkdir $dir
+  }
+  $data | save -f ($dir | path join "auth.nuon")
+}
+
+def "get header" [token?: string] {
+  if ($token | is-empty) {
+    []
+  } else {
+    [
+      Authorization, $"Bearer ($token)"
+      User-Agent, "Terminal/1.0 (Linux x86_64)"
+    ]
+  }
+}
+
+def "get base" [url: string] {
+  $"http://localhost:3000/api/v1/client/auth($url)"
+}
+
+def "post" [url: string, body: record, token?: string] {
+  (http post -f -e -t "application/json" -H (get header $token) (get base $url) $body)
 }
 
 def "select" [] {
