@@ -1,40 +1,56 @@
 
-def run [name: string, wd: string, version?: string] {
+def base [dir: string] {
+  $env.HOME | path join "Documents" "gitlab" "payzum-frontend" $dir
+}
+
+def cmd_run [name: string, version?: string] {
   let image = if ($version | is-empty) { 
     "node:latest" 
   } else { 
     $"node:($version)" 
   }
-  docker run --rm --name $name -d -w "/wd" -v $"($wd):/wd" --network "host" $image /bin/bash -c "npm run dev"
+  let dir = (base $name)
+  docker run --rm --name $name -d -w "/wd" -v $"($dir):/wd" --network "host" $image /bin/bash -c "npm run dev"
 }
 
-def stop [name: string] {
+def cmd_stop [name: string] {
   docker stop $name
 }
 
-def update [repo: string] {
-  git -C $repo fetch
-  git -C $repo pull
+def cmd_restart [name: string] {
+  docker restart $name
 }
 
-def base [dir: string] {
-  $env.HOME | path join "Documents" "gitlab" "payzum-frontend" $dir
+def cmd_pull [name: string] {
+  let dir = (base $name)
+  git -C $dir fetch
+  git -C $dir pull
+}
+
+def name [n: string] {
+  $"payzum-frontend-($n)"
 }
 
 export def up [] {
-  run "payzum-frontend-user" (base "payzum-frontend-user") "16"
-  run "payzum-frontend-admin" (base "payzum-frontend-admin") "18"
-  run "payzum-frontend-payment" (base "payzum-frontend-payment") "20"
+  cmd_run (name "user") "16"
+  cmd_run (name "admin") "18"
+  cmd_run (name "payment") "20"
 }
 
 export def down [] {
-  stop "payzum-frontend-user"
-  stop "payzum-frontend-admin"
-  stop "payzum-frontend-payment"
+  cmd_stop (name "user")
+  cmd_stop (name "admin")
+  cmd_stop (name "payment")
 }
 
-export def refresh [] {
-  update (base "payzum-frontend-user")
-  update (base "payzum-frontend-admin")
-  update (base "payzum-frontend-payment")
+export def restarts [] {
+  cmd_restart (name "user")
+  cmd_restart (name "admin")
+  cmd_restart (name "payment")
+}
+
+export def pulls [] {
+  cmd_pull (name "user")
+  cmd_pull (name "admin")
+  cmd_pull (name "payment")
 }

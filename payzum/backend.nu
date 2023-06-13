@@ -1,23 +1,29 @@
 
-def run [name: string, wd: string] {
-  docker run --rm --name $name -d -w "/wd" -v $"($wd):/wd" --network "host" "cosmtrek/air" -c ./tools/air.toml
+def base [name: string] {
+  $env.HOME | path join "Documents" "gitlab" "payzum-backend" $name
 }
 
-def stop [name: string] {
+def cmd_run [name: string] {
+  let dir = (base $name)
+  docker run --rm --name $name -d -w "/wd" -v $"($dir):/wd" --network "host" "cosmtrek/air" -c ./tools/air.toml
+}
+
+def cmd_stop [name: string] {
   docker stop $name
 }
 
-def restart [name: string] {
+def cmd_restart [name: string] {
   docker restart $name
 }
 
-def update [repo: string] {
-  git -C $repo fetch
-  git -C $repo pull
+def cmd_log [name: string] {
+  docker logs -f $name
 }
 
-def base [dir: string] {
-  $env.HOME | path join "Documents" "gitlab" "payzum-backend" $dir
+def cmd_pull [name: string] {
+  let dir = (base $name)
+  git -C $dir fetch
+  git -C $dir pull
 }
 
 def names [] {
@@ -28,38 +34,54 @@ def name [n: string] {
   $"payzum-backend-($n)"
 }
 
+export def run [n: string@names] {
+  cmd_run (name $n)
+}
+
 export def up [] {
-  run (name "main") (base (name "main"))
-  run (name "out") (base (name "out"))
-  run (name "price") (base (name "price"))
-  run (name "upload") (base (name "upload"))
-  run (name "daemon") (base (name "daemon"))
+  run "main"
+  run "out"
+  run "price"
+  run "upload"
+  run "daemon"
+}
+
+export def stop [n: string@names] {
+  cmd_stop (name $n)
 }
 
 export def down [] {
-  stop (name "main")
-  stop (name "out")
-  stop (name "price")
-  stop (name "upload")
-  stop (name "daemon")
+  stop "main"
+  stop "out"
+  stop "price"
+  stop "upload"
+  stop "daemon"
 }
 
-export def restart [] {
-  restart (name "main")
-  restart (name "out")
-  restart (name "price")
-  restart (name "upload")
-  restart (name "daemon")
+export def restart [n: string@names] {
+  cmd_restart (name $n)
 }
 
-export def refresh [] {
-  update (base (name "main"))
-  update (base (name "out"))
-  update (base (name "price"))
-  update (base (name "upload"))
-  update (base (name "daemon"))
+export def restarts [] {
+  restart "main"
+  restart "out"
+  restart "price"
+  restart "upload"
+  restart "daemon"
 }
 
-export def logs [n: string@names] {
-  docker logs -f (name $n)
+export def pull [n: string@names] {
+  cmd_pull (name $n)
+}
+
+export def pulls [] {
+  pull "main"
+  pull "out"
+  pull "price"
+  pull "upload"
+  pull "daemon"
+}
+
+export def log [n: string@names] {
+  cmd_log (name $n)
 }
