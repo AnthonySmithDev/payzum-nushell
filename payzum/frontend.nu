@@ -5,7 +5,7 @@ def run [name: string, wd: string, version?: string] {
   } else { 
     $"node:($version)" 
   }
-  (docker run --rm --name $name -d -w "/wd" -v $"($wd):/wd" --network "host" $image /bin/bash -c "npm run dev")
+  docker run --rm --name $name -d -w "/wd" -v $"($wd):/wd" --network "host" $image /bin/bash -c "npm run dev"
 }
 
 def stop [name: string] {

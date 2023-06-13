@@ -7,6 +7,10 @@ def stop [name: string] {
   docker stop $name
 }
 
+def restart [name: string] {
+  docker restart $name
+}
+
 def update [repo: string] {
   git -C $repo fetch
   git -C $repo pull
@@ -38,6 +42,14 @@ export def down [] {
   stop (name "price")
   stop (name "upload")
   stop (name "daemon")
+}
+
+export def restart [] {
+  restart (name "main")
+  restart (name "out")
+  restart (name "price")
+  restart (name "upload")
+  restart (name "daemon")
 }
 
 export def refresh [] {
