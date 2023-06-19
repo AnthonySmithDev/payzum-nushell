@@ -8,7 +8,7 @@ def "get header" [] {
 }
 
 def "get base" [url: string] {
-  $"http://localhost:3000/api/v1/client($url)"
+  $"http://localhost:3000/api/v1/user($url)"
 }
 
 export def "post" [url: string, body: record] {

@@ -5,7 +5,8 @@ def base [name: string] {
 
 def cmd_run [name: string] {
   let dir = (base $name)
-  docker run --rm --name $name -d -w "/wd" -v $"($dir):/wd" --network "host" "cosmtrek/air" -c ./tools/air.toml
+  # docker volume create golang
+  docker run --rm --name $name -d -w "/wd" -v $"($dir):/wd" -v "golang:/go/pkg" --network "host" "cosmtrek/air" -c ./tools/air.toml
 }
 
 def cmd_stop [name: string] {

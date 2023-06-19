@@ -83,7 +83,7 @@ def "get header" [token?: string] {
 }
 
 def "get base" [url: string] {
-  $"http://localhost:3000/api/v1/client/auth($url)"
+  $"http://localhost:3000/api/v1/user/auth($url)"
 }
 
 def "post" [url: string, body: record, token?: string] {
