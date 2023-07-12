@@ -21,6 +21,14 @@ def cmd_restart [name: string] {
   docker restart $name
 }
 
+def cmd_clone [repo: string] {
+  let path = ($env.HOME | path join "Documents" "gitlab" "payzum-frontend")
+  if not ($path | path exists) {
+    mkdir $path
+  }
+  git -C $path clone $repo
+}
+
 def cmd_pull [name: string] {
   let dir = (base $name)
   git -C $dir fetch
@@ -53,4 +61,10 @@ export def pulls [] {
   cmd_pull (name "user")
   cmd_pull (name "admin")
   cmd_pull (name "payment")
+}
+
+export def clones [] {
+  cmd_clone "git@192.168.100.11:JeanMg25/payzum-frontend-user.git"
+  cmd_clone "git@192.168.100.11:root/payzum-frontend-admin.git"
+  cmd_clone "git@192.168.100.11:JeanMg25/payzum-frontend-payment.git"
 }

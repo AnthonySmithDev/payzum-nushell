@@ -21,6 +21,14 @@ def cmd_log [name: string] {
   docker logs -f $name
 }
 
+def cmd_clone [repo: string] {
+  let $path = ($env.HOME | path join "Documents" "gitlab" "payzum-backend")
+  if not ($path | path exists) {
+    mkdir $path
+  }
+  git -C $path clone $repo
+}
+
 def cmd_pull [name: string] {
   let dir = (base $name)
   git -C $dir fetch
@@ -28,7 +36,14 @@ def cmd_pull [name: string] {
 }
 
 def names [] {
-  [ "main" "out" "price" "upload" "daemon" ]
+  [ 
+    "main"
+    "out"
+    "price"
+    "upload"
+    "nanod"
+    "bitcoind"
+  ]
 }
 
 def name [n: string] {
@@ -44,7 +59,8 @@ export def up [] {
   run "out"
   run "price"
   run "upload"
-  run "daemon"
+  run "nanod"
+  run "bitcoind"
 }
 
 export def stop [n: string@names] {
@@ -56,7 +72,8 @@ export def down [] {
   stop "out"
   stop "price"
   stop "upload"
-  stop "daemon"
+  stop "nanod"
+  stop "bitcoind"
 }
 
 export def restart [n: string@names] {
@@ -68,7 +85,8 @@ export def restarts [] {
   restart "out"
   restart "price"
   restart "upload"
-  restart "daemon"
+  restart "nanod"
+  restart "bitcoind"
 }
 
 export def pull [n: string@names] {
@@ -80,7 +98,18 @@ export def pulls [] {
   pull "out"
   pull "price"
   pull "upload"
-  pull "daemon"
+  pull "nanod"
+  pull "bitcoind"
+}
+
+export def clones [] {
+  cmd_clone "git@192.168.100.11:payzum-backend/payzum-backend-all.git"
+  cmd_clone "git@192.168.100.11:payzum-backend/payzum-backend-main.git"
+  cmd_clone "git@192.168.100.11:payzum-backend/payzum-backend-out.git"
+  cmd_clone "git@192.168.100.11:payzum-backend/payzum-backend-price.git"
+  cmd_clone "git@192.168.100.11:payzum-backend/payzum-backend-upload.git"
+  cmd_clone "git@192.168.100.11:payzum-backend/payzum-backend-nanod.git"
+  cmd_clone "git@192.168.100.11:payzum-backend/payzum-backend-bitcoind.git"
 }
 
 export def log [n: string@names] {
